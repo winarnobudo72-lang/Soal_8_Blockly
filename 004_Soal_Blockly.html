@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ujian Interaktif Informatika - Pemrograman Blockly</title>
+    <style>
+        :root {
+            --primary: #2b580c;
+            --secondary: #639a67;
+            --bg: #f4f7f6;
+            --text: #333333;
+            --card: #ffffff;
+            --danger: #d9534f;
+            --success: #28a745;
+            --warning: #f0ad4e;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .header h2, .header h3, .header h4 {
+            margin: 5px 0;
+            color: var(--primary);
+        }
+
+        .timer-container {
+            position: sticky;
+            top: 10px;
+            background: #eaf2e8;
+            padding: 10px 15px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 1px solid #c7e0c4;
+        }
+
+        .timer {
+            color: var(--danger);
+            font-size: 1.2rem;
+        }
+
+        .student-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+        }
+
+        .question-card {
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .question-title {
+            font-weight: bold;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .options label {
+            display: block;
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .options label:hover {
+            background: #eaf2e8;
+            border-color: var(--primary);
+        }
+
+        .options input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #1e3d08;
+        }
+
+        .btn-retry {
+            background-color: var(--warning);
+        }
+
+        .btn-retry:hover {
+            background-color: #ec971f;
+        }
+
+        .btn-wa {
+            background-color: #25d366;
+        }
+
+        .btn-wa:hover {
+            background-color: #1eb956;
+        }
+
+        #result-screen {
+            display: none;
+            text-align: center;
+        }
+
+        .score-box {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin: 15px 0;
+            color: var(--primary);
+        }
+
+        .status-msg {
+            font-size: 1.3rem;
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-fail {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h2>SOAL INTERAKTIF INFORMATIKA FASE D</h2>
+        <h3>MATERI: APLIKASI BLOCKLY</h3>
+        <h4>SMP NEGERI 2 NGADIREJO</h4>
+        <p><small>Guru Pengampu: Budi Winarno, S.Kom.</small></p>
+    </div>
+
+    <!-- Halaman Soal -->
+    <div id="quiz-screen">
+        <div class="student-info">
+            <div class="input-group">
+                <label for="nama">Nama Lengkap:</label>
+                <input type="text" id="nama" placeholder="Masukkan nama Anda">
+            </div>
+            <div class="input-group">
+                <label for="kelas">Kelas / No. Absen:</label>
+                <input type="text" id="kelas" placeholder="Contoh: 8A / 12">
+            </div>
+        </div>
+
+        <div class="timer-container">
+            <span>Sisa Waktu Ujian:</span>
+            <span id="timer" class="timer">60:00</span>
+        </div>
+
+        <div id="questions-container"></div>
+
+        <button class="btn" onclick="submitQuiz()">Selesai & Kumpulkan Jawaban</button>
+    </div>
+
+    <!-- Halaman Hasil / Nilai -->
+    <div id="result-screen">
+        <h2>Hasil Ujian Interaktif</h2>
+        <p id="res-nama" style="font-weight: bold; margin-bottom: 2px;"></p>
+        <p id="res-kelas" style="color: #666; margin-top: 0;"></p>
+        
+        <div class="score-box" id="res-score">0</div>
+        
+        <div id="status-message" class="status-msg"></div>
+        <p id="res-detail"></p>
+
+        <div id="action-buttons">
+            <button class="btn" onclick="downloadResult()">Unduh Hasil Nilai (TXT)</button>
+            <button class="btn btn-wa" onclick="sendWA()">Kirim Nilai ke Guru via WhatsApp</button>
+            <button id="btn-repeat" class="btn btn-retry" onclick="resetQuiz()" style="display:none;">Ulangi Ujian (Kembali ke Soal)</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const masterQuestions = [
+    {q: "Aplikasi Blockly dikembangkan oleh perusahaan teknologi...", options: ["Microsoft", "Google", "Apple", "Adobe"], answer: 1},
+    {q: "Blockly merupakan bahasa pemrograman yang berbasis...", options: ["Teks murni", "Visual / Blok", "Biner", "Assembly"], answer: 1},
+    {q: "Area tempat disusunnya blok-blok perintah dalam aplikasi Blockly disebut...", options: ["Block Palette", "Workspace", "Stage", "Canvas"], answer: 1},
+    {q: "Permainan Blockly Games yang melatih konsep perulangan dan kondisi pada jalur labirin adalah...", options: ["Puzzle", "Maze", "Bird", "Turtle"], answer: 1},
+    {q: "Blok perintah untuk menggerakkan karakter maju satu langkah pada Maze adalah...", options: ["turn left", "move forward", "turn right", "repeat until"], answer: 1},
+    {q: "Blok perulangan yang akan terus menjalankan perintah sampai tujuan tercapai adalah...", options: ["repeat 10 times", "repeat until at finish", "if path to left", "while false"], answer: 1},
+    {q: "Blok 'if path to the left' berfungsi untuk...", options: ["Mengecek apakah ada jalan ke sebelah kiri", "Mengubah arah ke kiri secara langsung", "Maju 2 langkah ke depan", "Menghentikan permainan"], answer: 0},
+    {q: "Permainan Blockly yang berfokus pada menggambar garis dan bentuk geometris adalah...", options: ["Turtle", "Bird", "Movie", "Puzzle"], answer: 0},
+    {q: "Untuk memutar arah karakter ke kanan sebesar 90 derajat digunakan blok...", options: ["turn right by 90", "turn left by 90", "move forward by 90", "point in direction 0"], answer: 0},
+    {q: "Warna blok pada kelompok Logika (Logic) di Blockly biasanya ber-orientasi warna...", options: ["Biru", "Hijau", "Kuning", "Merah"], answer: 0},
+    {q: "Permainan awal pada Blockly Games yang mengajarkan pengenalan objek dan sifat-sifatnya adalah...", options: ["Maze", "Puzzle", "Pond", "Genetics"], answer: 1},
+    {q: "Blok 'if-else' digunakan untuk menyelesaikan kondisi pemrograman yang memiliki...", options: ["Satu pilihan tindakan", "Dua pilihan alternatif tindakan", "Tanpa tindakan", "Perulangan tak terbatas"], answer: 1},
+    {q: "Dalam permainan Bird pada Blockly Games, sudut penentu arah terbang diukur dalam satuan...", options: ["Meter", "Piksel", "Derajat", "Detik"], answer: 2},
+    {q: "Fungsi dari penggunaan blok perulangan (loop) adalah...", options: ["Memperlama eksekusi program", "Meringkas blok perintah yang sama berulang kali", "Menghapus kode secara otomatis", "Mengubah warna panggung"], answer: 1},
+    {q: "Pada permainan Turtle, untuk mengangkat pena agar gerakan kura-kura tidak meninggalkan garis digunakan blok...", options: ["pen up", "pen down", "set color", "width"], answer: 0},
+    {q: "Sebaliknya, blok 'pen down' pada permainan Turtle berguna untuk...", options: ["Mulai menggambar garis", "Menghapus garis", "Menghentikan program", "Mengangkat pena"], answer: 0},
+    {q: "Keuntungan utama belajar pemrograman visual menggunakan Blockly adalah...", options: ["Menghindari kesalahan penulisan sintaks (syntax error)", "Tidak perlu menggunakan logika", "Hasil program langsung menjadi aplikasi Android", "Menghemat memori RAM komputer secara drastis"], answer: 0},
+    {q: "Blok yang digunakan untuk melakukan operasi penjumlahan atau pengurangan berada pada kategori...", options: ["Logic", "Math", "Text", "Loops"], answer: 1},
+    {q: "Pernyataan 'Jika ada jalan ke depan, maka maju' cocok diimplementasikan dengan blok...", options: ["if path ahead -> do move forward", "repeat until finish", "turn left", "set color red"], answer: 0},
+    {q: "Permainan Blockly yang menggunakan sumbu koordinat X dan Y untuk menggerakkan objek gambar animasi adalah...", options: ["Movie", "Maze", "Puzzle", "Bird"], answer: 0},
+    {q: "Titik pusat tengah sumbu X dan Y pada kanvas permainan Movie biasanya berkisar pada rentang...", options: ["0 sampai 100", "0 sampai 10", "-100 sampai 100", "1 sampai 360"], answer: 0},
+    {q: "Kategori blok 'Loops' dalam Blockly digunakan untuk...", options: ["Mengatur suara", "Mengulang suatu blok instruksi", "Menguji variabel", "Membuat fungsi baru"], answer: 1},
+    {q: "Apabila karakter berada di jalan buntu pada permainan Maze, blok tindakan yang harus diambil adalah...", options: ["Berputar arah (turn right / turn left)", "Maju terus", "Menghentikan aplikasi", "Menghapus blok"], answer: 0},
+    {q: "Tujuan utama dari seri permaianan Blockly Games adalah...", options: ["Menguji kecepatan mengetik", "Mengenalkan dasar-dasar pemrograman komputer secara interaktif", "Membuat desain grafis 3D", "Mengedit video secara profesional"], answer: 1},
+    {q: "Pada permainan Pond (Kolam), konsep pemrograman yang diperkenalkan meliputi...", options: ["Kendali jarak dan penembakan menggunakan logika matematika", "Menggambar garis lurus", "Mencocokkan gambar hewan", "Membuat teks narasi"], answer: 0},
+    {q: "Blok perintah pada Blockly dapat disepadankan dengan kode bahasa pemrograman tekstual seperti...", options: ["JavaScript / Python", "HTML / CSS", "SQL", "Assembly"], answer: 0},
+    {q: "Proses menghubungkan blok satu dengan blok lainnya di Workspace dilakukan dengan cara...", options: ["Drag and Drop (Seret dan Lepas)", "Mengetik kode", "Mengunggah file", "Mengklik kanan mouse"], answer: 0},
+    {q: "Jika kita ingin mengulang gerakan sebanyak 4 kali untuk membuat persegi pada Turtle, kita menggunakan blok...", options: ["repeat 4 times", "repeat until", "if count = 4", "turn 4 times"], answer: 0},
+    {q: "Sudut putar yang digunakan untuk membuat bangun datar segitiga sama sisi pada Turtle adalah...", options: ["90 derajat", "120 derajat", "180 derajat", "60 derajat"], answer: 1},
+    {q: "Sudut putar untuk membuat bangun persegi pada Turtle adalah...", options: ["45 derajat", "90 derajat", "120 derajat", "360 derajat"], answer: 1},
+    {q: "Dalam Blockly, blok yang digunakan untuk menyimpan nilai yang dapat berubah dinamakan...", options: ["Variable", "Constant", "Function", "Output"], answer: 0},
+    {q: "Aplikasi Blockly dapat diakses secara gratis melalui...", options: ["Peramban Web (Browser)", "Aplikasi Pengolah Kata", "Sistem Kasir", "Command Prompt"], answer: 0},
+    {q: "Blok 'not' pada kategori Logika digunakan untuk...", options: ["Pembalik nilai logika (negasi)", "Menjumlahkan dua angka", "Mengulang instruksi", "Menghentikan pergerakan"], answer: 0},
+    {q: "Operasi logika 'AND' akan bernilai benar (True) apabila...", options: ["Kedua kondisi bernilai benar", "Salah satu kondisi bernilai benar", "Kedua kondisi bernilai salah", "Tidak ada kondisi"], answer: 0},
+    {q: "Operasi logika 'OR' akan bernilai benar (True) apabila...", options: ["Setidaknya salah satu kondisi bernilai benar", "Kedua kondisi harus salah", "Kedua kondisi harus bernilai sama", "Semua kondisi salah"], answer: 0},
+    {q: "Fitur untuk melihat hasil konversi blok visual Blockly ke kode teks (misal JavaScript) disebut...", options: ["Code Viewer / Show Code", "Trash Can", "Zoom In", "Run Program"], answer: 0},
+    {q: "Tempat pembuangan blok perintah yang tidak digunakan pada Workspace disimbolkan dengan ikon...", options: ["Tempat sampah (Trash Can)", "Pensil", "Gunting", "Kertas"], answer: 0},
+    {q: "Ketika susunan blok dijalankan tetapi karakter menabrak dinding pada Maze, hal itu menunjukkan adanya kesalahan...", options: ["Logika Algoritma", "Sistem Komputer", "Perangkat Harddisk", "Jaringan Internet"], answer: 0},
+    {q: "Blok percabangan 'if ... else if ... else' digunakan untuk kondisi alternatif sejumlah...", options: ["Lebih dari 2 pilihan", "Hanya 1 pilihan", "Tanpa pilihan", "Dua pilihan saja"], answer: 0},
+    {q: "Urutan langkah logis dalam menyelesaikan tantangan permainan Blockly disebut...", options: ["Algoritma", "Struktur Data", "Hardware", "Prosesor"], answer: 0},
+    {q: "Dalam permainan Bird, kondisi 'if bird has worm' berarti...", options: ["Mengecek apakah burung sudah mengambil cacing", "Mengukur jarak terbang burung", "Menentukan kecepatan burung", "Mengubah warna burung"], answer: 0},
+    {q: "Untuk mempercepat pergerakan simulasi pada Blockly Games biasanya disediakan fitur...", options: ["Slider Kecepatan (Speed Slider)", "Tombol Pause", "Tombol Refresh", "Tombol Delete"], answer: 0},
+    {q: "Nilai Boolean pada blok Logika Blockly terdiri dari dua nilai yaitu...", options: ["True dan False", "1 dan 2", "Yes dan No", "On dan Off"], answer: 0},
+    {q: "Memecah masalah kompleks pada Blockly Games menjadi bagian-bagian kecil dinamakan...", options: ["Dekomposisi", "Abstraksi", "Pengenalan Pola", "Algoritma"], answer: 0},
+    {q: "Menghilangkan blok yang tidak perlu agar susunan blok lebih ringkas menerapkan prinsip...", options: ["Abstraksi", "Dekomposisi", "Koding", "Simulasi"], answer: 0}
+];
+
+let questions = [];
+let timeRemaining = 3600; // 60 menit
+let timerInterval;
+let finalScore = 0;
+let correctCount = 0;
+let studentName = "";
+let studentClass = "";
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+function initQuiz() {
+    timeRemaining = 3600;
+    
+    // Salin bank soal master dan acak
+    let shuffledMaster = JSON.parse(JSON.stringify(masterQuestions));
+    shuffle(shuffledMaster);
+    
+    // Ambil 40 soal secara acak dari total 45 bank soal
+    questions = shuffledMaster.slice(0, 40);
+
+    const container = document.getElementById('questions-container');
+    container.innerHTML = '';
+
+    questions.forEach((qObj, index) => {
+        let originalOptions = qObj.options.map((opt, idx) => ({ text: opt, isCorrect: idx === qObj.answer }));
+        let shuffledOptions = shuffle(originalOptions);
+
+        let qHTML = `<div class="question-card">
+            <div class="question-title">${index + 1}. ${qObj.q}</div>
+            <div class="options">`;
+
+        shuffledOptions.forEach((opt, optIndex) => {
+            qHTML += `<label>
+                <input type="radio" name="q${index}" value="${opt.isCorrect ? '1' : '0'}">
+                ${String.fromCharCode(65 + optIndex)}. ${opt.text}
+            </label>`;
+        });
+
+        qHTML += `</div></div>`;
+        container.innerHTML += qHTML;
+    });
+
+    startTimer();
+}
+
+function startTimer() {
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        let minutes = Math.floor(timeRemaining / 60);
+        let seconds = timeRemaining % 60;
+
+        document.getElementById('timer').innerText = 
+            `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            alert('Waktu ujian telah habis!');
+            submitQuiz();
+        }
+    }, 1000);
+}
+
+function submitQuiz() {
+    studentName = document.getElementById('nama').value.trim();
+    studentClass = document.getElementById('kelas').value.trim();
+
+    if (!studentName || !studentClass) {
+        alert('Mohon isi Nama Lengkap dan Kelas/No. Absen terlebih dahulu!');
+        return;
+    }
+
+    clearInterval(timerInterval);
+
+    correctCount = 0;
+    questions.forEach((_, index) => {
+        const selected = document.querySelector(`input[name="q${index}"]:checked`);
+        if (selected && selected.value === '1') {
+            correctCount++;
+        }
+    });
+
+    finalScore = (correctCount / questions.length) * 100;
+
+    document.getElementById('quiz-screen').style.display = 'none';
+    document.getElementById('result-screen').style.display = 'block';
+
+    document.getElementById('res-nama').innerText = "Nama: " + studentName;
+    document.getElementById('res-kelas').innerText = "Kelas/Absen: " + studentClass;
+    document.getElementById('res-score').innerText = finalScore.toFixed(0);
+    document.getElementById('res-detail').innerText = `Jumlah Benar: ${correctCount} dari ${questions.length} Soal`;
+
+    const statusBox = document.getElementById('status-message');
+    const repeatBtn = document.getElementById('btn-repeat');
+
+    if (finalScore >= 80) {
+        statusBox.className = "status-msg status-success";
+        statusBox.innerText = "Selamat, Anda BERHASIL! (Lulus KKM)";
+        repeatBtn.style.display = "none";
+    } else {
+        statusBox.className = "status-msg status-fail";
+        statusBox.innerText = "Maaf, Anda BELUM BERHASIL. Silakan Mengulang Lagi!";
+        repeatBtn.style.display = "block";
+    }
+}
+
+function resetQuiz() {
+    document.getElementById('result-screen').style.display = 'none';
+    document.getElementById('quiz-screen').style.display = 'block';
+    initQuiz();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function downloadResult() {
+    const textContent = `====================================
+LAPORAN HASIL UJIAN INTERAKTIF
+Mata Pelajaran : Informatika (Aplikasi Blockly)
+Sekolah        : SMP Negeri 2 Ngadirejo
+Pengampu       : Budi Winarno, S.Kom.
+====================================
+Nama           : ${studentName}
+Kelas/No.Absen : ${studentClass}
+Jumlah Benar   : ${correctCount} / ${questions.length}
+NILAI AKHIR    : ${finalScore.toFixed(0)}
+KETERANGAN     : ${finalScore >= 80 ? 'BERHASIL / LULUS' : 'BELUM BERHASIL / REVISI'}
+====================================`;
+
+    const blob = new Blob([textContent], { type: 'text/plain' });
+    const anchor = document.createElement('a');
+    anchor.download = `Nilai_Blockly_${studentName.replace(/\s+/g, '_')}.txt`;
+    anchor.href = window.URL.createObjectURL(blob);
+    anchor.click();
+}
+
+function sendWA() {
+    const statusText = finalScore >= 80 ? "BERHASIL" : "BELUM BERHASIL";
+    const textMsg = `Halo Pak Budi Winarno, S.Kom.,%0ASaya telah selesai mengerjakan Ujian Informatika Blockly.%0A%0ANama: *${studentName}*%0AKelas: *${studentClass}*%0ABenar: ${correctCount}/${questions.length}%0ANilai: *${finalScore.toFixed(0)}*%0AKeterangan: *${statusText}*`;
+    window.open(`https://api.whatsapp.com/send?text=${textMsg}`, '_blank');
+}
+
+window.onload = initQuiz;
+</script>
+</body>
+</html>
